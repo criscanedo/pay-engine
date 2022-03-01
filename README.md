@@ -51,18 +51,18 @@ small project were for the sake of simplicity and readability. For example:
 (More explanations are provided in a handful of small comments in the code.)
 
 ### Files
-* account.rs: A struct that represents a client's account state. Includes a
+* **account.rs**: A struct that represents a client's account state. Includes a
 	function for state transition.
-* account\_registry.rs: An actor struct responsible for reading and writing
+* **account**\_**registry.rs**: An actor struct responsible for reading and writing
 	to and from the data source containing all client accounts.
-* actor.rs: Bare minimum traits for actor types to demonstrate the potential
+* **actor.rs**: Bare minimum traits for actor types to demonstrate the potential
 	of extensibility and maintainability.
-* engine.rs: The library entry point suitable only for this current simulated
+* **engine.rs**: The library entry point suitable only for this current simulated
 	project.
-* messages.rs: Message enum types to send between actors.
-* runner.rs: Binary entry point.
-* transaction.rs: A struct that represents a transaction's state.
-* transaction\_registry.rs: An actor struct reponsible for reading and writing
+* **messages.rs**: Message enum types to send between actors.
+* **runner.rs**: Binary entry point.
+* **transaction.rs**: A struct that represents a transaction's state.
+* **transaction**\_**registry.rs**: An actor struct reponsible for reading and writing
 	to and from the data source containing all processed transactions.
 
 ### Explanation
@@ -80,7 +80,8 @@ asynchronously.
 The large `while let` that makes up the rest of the processing function applies
 logic for each message with minimal error handling and logging. (A real
 application would have much more robust error handling as mentioned in comments
-in the code.)
+in the code.) **The program does not process transactions for frozen accounts.
+The transactions are ignored and messages are logged to `STDERR`.**
 
 When it is time to apply a change to a client account, the `apply()` function
 is called on the account object that is to change and returns a **new** copy
