@@ -31,7 +31,7 @@ pub enum TransactionRegistryMsg {
     },
 }
 
-// Ideal message enum to send between actors
+// Ideal message enum to send to the absent 'account process' actor
 #[derive(Debug, Deserialize)]
 pub enum TransactionMsg {
     Deposit { client: u16, tx: u32, amount: f64 },

@@ -95,6 +95,11 @@ impl AccountRegistryHandle {
             id: client_id, respond_to: send
         }).await;
 
+        // If the lookup fails, the client account does not exist,
+        // therefore send a subsequent `Register` message. Keeping this logic
+        // in the handle allows for future modifications such as retriving the
+        // client account from data source on the calling thread rather than in
+        // the actor thread which would block
         match recv.await.expect("AccountRegistry task killed") {
             Some(account) => Some(account),
             None => {

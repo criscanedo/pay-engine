@@ -44,9 +44,8 @@ fn main() {
         let accounts = AccountRegistryHandle::new();
         let transactions = TransactionRegistryHandle::new();
 
-        // Ideally this would be an actor processing streams sequentially
-        // from multiple concurrent requests. For now we assume this current
-        // "request" is next in queue
+        // Ideally this would be an actor handling incoming streams from
+        // multiple concurrent requests
         match pay_engine::process(
             args[1].clone(),
             accounts.clone(),
