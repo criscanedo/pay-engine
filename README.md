@@ -2,12 +2,12 @@
 The idea was to write a quick and naive implementation of a financial
 transaction engine using the actor model. For this simulated scenario the
 program takes as input a CSV file representing a series of transactions then
-writes to `STDOUT` the account info for each client after processing.
+writes the account info for each client to `STDOUT` after processing.
 
 While I am aware of the `Actix` crate for an actor model framework in Rust, I
 decided to implement two extremely basic actors using what `Tokio` has to
 offer for the sake of simplicity. The majority of the decisions made for this
-small project were for the sake of simplicity and readability. Examples:
+small project were for the sake of simplicity and readability. For example:
 
 * Parsing the CSV file synchronously instead of asynchronously. Since I decided
 	to use `Tokio` as the asynchronous runtime, using the `csv-async` crate
@@ -19,7 +19,7 @@ small project were for the sake of simplicity and readability. Examples:
 	some state. No locks to synchronize access to shared mutable state means
 	less code to read. Additionally, the code in this example heavily relies
 	upon copy by value to remain thread-safe.
-* Two actors to represent synchronized mutation of the "database tables", but
+* Two actors to represent synchronized mutation of the "data sources", but
 	no actor for handling concurrent transaction streams and processing them
 	sequentially. The entirety of the logic in `pay_engine::process()`, and more,
 	would exist in said actor. However, I decided 2 actor implementations was
@@ -32,20 +32,20 @@ small project were for the sake of simplicity and readability. Examples:
 	up different servers and specify different `receiver` and `sender` types
 	operating on different message types, etc.
 * Returning `Option` types instead of `Result` types from the actor handlers,
-	and actors themselves. There was no other reason to do this other than
+	and the actors themselves. There was no other reason to do this other than
 	to save a bit of time and code for simplicity and readability. Comments
 	in `pay_engine::process()` expand on this a little more though it's very
 	easy to see the `Result` type offers more robust handling of fallible
-	operations and allow cleaner control flow to log and perform subsequent
+	operations and allows for cleaner control flow to log and perform subsequent
 	logic.
 * Use of `pay_engine::transaction::Transaction` type in this project instead of
 	`pay_engine::messages::TransactionMsg`. I would prefer to use the latter to
 	deserialize the CSV records into and use as the message type for
-	message-passing to the absent "process actor" (in this case is the
+	message-passing to the absent "process actor" (in this case would be the
 	`pay_engine::process()` function). However, there doesn't seem to be any
 	built in support for this type of deserialization with `csv` and `serde`.
-	Therefore, in order to save some extra steps and code, I settled with the
-	type the code is using for now.
+	So in order to save some extra steps and code manually writing
+	deserialization logic, I settled with the `Transaction` type for now.
 * Absence of unit tests upon initial commit and cargo docs.
 
 (More explanations are provided in a handful of small comments in the code.)
@@ -90,10 +90,10 @@ was successful, the transaction is then persisted to a data source. In the
 case of Dispute transactions, the transaction disputed is also updated and
 stored.
 
-Upon completion the simulated "request thread" (`process()`) joins with the
-parent "server" task (tokio runtime) and the returned `Result` is mapped to
-another `Result` holding a collection of all accounts. The final `Result`
-is then mapped accordingly to a call to either `success()` or `fail()` which
-handles the remaining execution for the rest of the binary. That is, it prints
-the client accounts to `STDOUT` on success or an error message to `STDERR` on
-failure.
+Upon completion the simulated "request thread" (`pay_engine::process()`) joins
+with the parent "server" task (tokio runtime) and the returned `Result` is
+mapped to another `Result` holding a collection of all accounts. The final
+result is then mapped accordingly to a call to either `success()` or `fail()`
+which handles the remaining execution for the rest of the binary. That is, it
+prints the client accounts to `STDOUT` on success or an error message to
+`STDERR` on failure and exits.
